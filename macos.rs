@@ -84,5 +84,19 @@ impl AlertMethods for Alert {
             base::msg_send_void(transmute(self.nsalert), selector)
         }
     }
+
+    pub fn prompt_value(&self) -> ~str {
+        unsafe {
+            // [nstextfield stringValue]
+            let selector = sel_registerName(transmute(&"stringValue"[0]));
+            match self.nstextfield {
+                None => fail!("No prompt!"),
+                Some(nstextfield) => {
+                    let string = base::msg_send_id(transmute(nstextfield), selector);
+                    CFString::wrap_shared(transmute(string)).to_str()
+                }
+            }
+        }
+    }
 }
 
