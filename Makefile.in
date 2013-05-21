@@ -1,0 +1,31 @@
+VPATH=%VPATH%
+
+CC ?= gcc
+CXX ?= g++
+CXXFLAGS ?=
+AR ?= ar
+RUSTC ?= rustc
+RUSTFLAGS ?=
+
+RUST_SRC=$(shell find $(VPATH)/. -type f -name '*.rs')
+
+.PHONY: all
+all:	librustalert.dummy
+
+%.o:	%.c
+	$(CC) $< -o $@ -c $(CFLAGS)
+
+librustalert.dummy: alert.rc $(RUST_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
+	touch $@
+
+alert-test: alert.rc $(RUST_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@ --test
+
+check: alert-test
+	./alert-test
+
+.PHONY: clean
+clean:
+	rm -f *.o *.a *.so *.dylib *.dll *.dummy *-test
+

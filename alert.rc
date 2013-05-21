@@ -15,9 +15,13 @@ extern mod core_foundation;
 #[cfg(target_os="macos")]
 extern mod cocoa;
 
+#[cfg(target_os="linux")]
+pub use linux::Alert;
 #[cfg(target_os="macos")]
 pub use macos::Alert;
 
+#[cfg(target_os="linux")]
+mod linux;
 #[cfg(target_os="macos")]
 mod macos;
 
@@ -31,7 +35,7 @@ pub trait AlertMethods {
     fn add_prompt(&mut self);
     /// Runs the alert modally.
     fn run(&self);
+    /// Returns the value of the prompt.
+    fn prompt_value(&self) -> ~str;
 }
-
-
 
