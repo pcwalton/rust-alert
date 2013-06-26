@@ -12,7 +12,7 @@ use AlertMethods;
 use cocoa::appkit::{NSPoint, NSRect, NSSize};
 use cocoa::base::{objc_getClass, sel_registerName};
 use cocoa::base;
-use core::cast::{transmute, transmute_copy};
+use std::cast::{transmute, transmute_copy};
 use core_foundation::string::CFString;
 
 /// The low-level alert type.
