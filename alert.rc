@@ -19,11 +19,15 @@ extern mod cocoa;
 pub use linux::Alert;
 #[cfg(target_os="macos")]
 pub use macos::Alert;
+#[cfg(target_os="android")]
+pub use android::Alert;
 
 #[cfg(target_os="linux")]
 mod linux;
 #[cfg(target_os="macos")]
 mod macos;
+#[cfg(target_os="android")]
+mod android;
 
 #[cfg(testalert)]
 mod test;
