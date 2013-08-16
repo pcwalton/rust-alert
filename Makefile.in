@@ -16,11 +16,11 @@ all:	librustalert.dummy
 	$(CC) $< -o $@ -c $(CFLAGS)
 
 librustalert.dummy: alert.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< -o $@
+	$(RUSTC) $(RUSTFLAGS) $< --out-dir .
 	touch $@
 
 alert-test: alert.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< -o $@ --test
+	$(RUSTC) $(RUSTFLAGS) $< --out-dir . --test
 
 check: alert-test
 	./alert-test
