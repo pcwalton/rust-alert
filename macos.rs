@@ -51,7 +51,7 @@ impl AlertMethods for Alert {
         }
     }
 
-    pub fn add_prompt(&mut self) {
+    fn add_prompt(&mut self) {
         unsafe {
             // [NSTextField alloc]
             let class = objc_getClass(transmute(&"NSTextField"[0]));
@@ -78,14 +78,14 @@ impl AlertMethods for Alert {
         }
     }
 
-    pub fn run(&self) {
+    fn run(&self) {
         unsafe {
             let selector = sel_registerName(transmute(&"runModal"[0]));
             base::msg_send_void(transmute(self.nsalert), selector)
         }
     }
 
-    pub fn prompt_value(&self) -> ~str {
+    fn prompt_value(&self) -> ~str {
         unsafe {
             // [nstextfield stringValue]
             let selector = sel_registerName(transmute(&"stringValue"[0]));
