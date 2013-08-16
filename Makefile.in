@@ -20,7 +20,7 @@ librustalert.dummy: alert.rc $(RUST_SRC)
 	touch $@
 
 alert-test: alert.rc $(RUST_SRC)
-	$(RUSTC) $(RUSTFLAGS) $< --out-dir . --test
+	$(RUSTC) $(RUSTFLAGS) $< -o $@ --test
 
 check: alert-test
 	./alert-test
