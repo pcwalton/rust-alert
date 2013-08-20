@@ -18,15 +18,15 @@ impl AlertMethods for Alert {
         Alert
     }
 
-    pub fn add_prompt(&mut self) {
+    fn add_prompt(&mut self) {
         // TODO
     }
 
-    pub fn run(&self) {
+    fn run(&self) {
         // TODO
     }
 
-    pub fn prompt_value(&self) -> ~str {
+    fn prompt_value(&self) -> ~str {
         // TODO
         ~""
     }
