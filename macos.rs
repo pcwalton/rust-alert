@@ -28,6 +28,7 @@ pub struct Alert {
 
 impl AlertMethods for Alert {
     /// Creates a new alert with an OK and Cancel button.
+    #[fixed_stack_segment]
     fn new(message_text: &str) -> Alert {
         unsafe {
             let alert_string = CFString::new(message_text);
@@ -51,6 +52,7 @@ impl AlertMethods for Alert {
         }
     }
 
+    #[fixed_stack_segment]
     fn add_prompt(&mut self) {
         unsafe {
             // [NSTextField alloc]
@@ -78,6 +80,7 @@ impl AlertMethods for Alert {
         }
     }
 
+    #[fixed_stack_segment]
     fn run(&self) {
         unsafe {
             let selector = sel_registerName(transmute(&"runModal"[0]));
@@ -85,6 +88,7 @@ impl AlertMethods for Alert {
         }
     }
 
+    #[fixed_stack_segment]
     fn prompt_value(&self) -> ~str {
         unsafe {
             // [nstextfield stringValue]
