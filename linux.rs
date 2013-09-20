@@ -8,27 +8,29 @@
 // except according to those terms.
 
 use AlertMethods;
+use std::io;
 
 /// An alert.
-pub struct Alert;
+pub struct Alert {
+    url: ~str,
+}
 
 impl AlertMethods for Alert {
     fn new(_: &str) -> Alert {
-        // TODO
-        Alert
+        // TODO: Use a glfw window for prompt
+        Alert { url: ~"" }
     }
 
     fn add_prompt(&mut self) {
-        // TODO
+        print("URL: ");
+        self.url = io::stdin().read_line();
     }
 
     fn run(&self) {
-        // TODO
     }
 
     fn prompt_value(&self) -> ~str {
-        // TODO
-        ~""
+        self.url.clone()
     }
 }
 
