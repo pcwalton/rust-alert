@@ -23,11 +23,11 @@ pub use macos::Alert;
 pub use android::Alert;
 
 #[cfg(target_os="linux")]
-mod linux;
+pub mod linux;
 #[cfg(target_os="macos")]
-mod macos;
+pub mod macos;
 #[cfg(target_os="android")]
-mod android;
+pub mod android;
 
 #[cfg(testalert)]
 mod test;
