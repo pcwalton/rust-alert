@@ -8,7 +8,8 @@
 // except according to those terms.
 
 use AlertMethods;
-use std::io;
+use std::rt::io;
+use std::rt::io::buffered::BufferedReader;
 
 /// An alert.
 pub struct Alert {
@@ -23,7 +24,8 @@ impl AlertMethods for Alert {
 
     fn add_prompt(&mut self) {
         print("URL: ");
-        self.url = io::stdin().read_line();
+        self.url = BufferedReader::new(io::stdin())
+            .read_line().expect("Could not read URL from stdin");
     }
 
     fn run(&self) {
