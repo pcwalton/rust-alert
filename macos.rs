@@ -10,20 +10,15 @@
 use AlertMethods;
 
 use cocoa::appkit::{NSPoint, NSRect, NSSize};
-use cocoa::base::{objc_getClass, sel_registerName};
-use cocoa::base;
-use std::cast::{transmute, transmute_copy};
-use core_foundation::string::CFString;
-
-/// The low-level alert type.
-struct NSAlert;
-/// The low-level type of a text field.
-struct NSTextField;
+use cocoa::base::{ObjCMethodCall, id, nil};
+use core_foundation::base::TCFType;
+use core_foundation::string::{CFString, CFStringRef};
+use std::cast::transmute;
 
 /// An alert.
 pub struct Alert {
-    nsalert: *NSAlert,
-    nstextfield: Option<*NSTextField>,
+    nsalert: id,
+    nstextfield: Option<id>,
 }
 
 impl AlertMethods for Alert {
@@ -31,20 +26,19 @@ impl AlertMethods for Alert {
     #[fixed_stack_segment]
     fn new(message_text: &str) -> Alert {
         unsafe {
-            let alert_string = CFString::new(message_text);
-            let cancel_string = CFString::new_static("Cancel");
-            let empty_string = CFString::new_static("");
-            let class = objc_getClass(transmute(&"NSAlert"[0]));
-            let selector = sel_registerName(transmute(&"alertWithMessageText:defaultButton:\
-                                                        alternateButton:otherButton:\
-                                                        informativeTextWithFormat:"[0]));
-            let nsalert = base::msg_send_id_id_id_id_id_id(class,
-                                                           selector,
-                                                           transmute_copy(&alert_string.contents),
-                                                           transmute(0),
-                                                           transmute_copy(&cancel_string.contents),
-                                                           transmute(0),
-                                                           transmute_copy(&empty_string.contents));
+            let alert_string: CFString = from_str(message_text).unwrap();
+            let cancel_string = CFString::from_static_string("Cancel");
+            let empty_string = CFString::from_static_string("");
+            let nsalert = "NSAlert".send("alertWithMessageText:defaultButton:alternateButton:\
+                                          otherButton:informativeTextWithFormat:",
+                                         (transmute::<CFStringRef,id>(
+                                                 alert_string.as_concrete_TypeRef()),
+                                          nil,
+                                          transmute::<CFStringRef,id>(
+                                              cancel_string.as_concrete_TypeRef()),
+                                          nil,
+                                          transmute::<CFStringRef,id>(
+                                              empty_string.as_concrete_TypeRef())));
             Alert {
                 nsalert: transmute(nsalert),
                 nstextfield: None,
@@ -56,25 +50,20 @@ impl AlertMethods for Alert {
     fn add_prompt(&mut self) {
         unsafe {
             // [NSTextField alloc]
-            let class = objc_getClass(transmute(&"NSTextField"[0]));
-            let selector = sel_registerName(transmute(&"alloc"[0]));
-            let nstextfield = base::msg_send_id(class, selector);
+            let nstextfield = "NSTextField".send("alloc", ());
 
             // [nstextfield initWithFrame: NSMakeRect(0, 0, 200, 24)]
-            let selector = sel_registerName(transmute(&"initWithFrame:"[0]));
             let frame = NSRect {
                 origin: NSPoint::new(0.0, 0.0),
                 size: NSSize::new(200.0, 24.0),
             };
-            let nstextfield = base::msg_send_id_NSRect(nstextfield, selector, frame);
+            let nstextfield = nstextfield.send("initWithFrame:", frame);
 
             // [nsalert setAccessoryView: nstextfield];
-            let selector = sel_registerName(transmute(&"setAccessoryView:"[0]));
-            base::msg_send_void_id(transmute(self.nsalert), selector, nstextfield);
+            self.nsalert.send_void("setAccessoryView:", nstextfield);
 
             // [nsalert layout];
-            let selector = sel_registerName(transmute(&"layout"[0]));
-            base::msg_send_void(transmute(self.nsalert), selector);
+            self.nsalert.send_void("layout", ());
 
             self.nstextfield = Some(transmute(nstextfield))
         }
@@ -83,8 +72,7 @@ impl AlertMethods for Alert {
     #[fixed_stack_segment]
     fn run(&self) {
         unsafe {
-            let selector = sel_registerName(transmute(&"runModal"[0]));
-            base::msg_send_void(transmute(self.nsalert), selector)
+            self.nsalert.send_void("runModal", ())
         }
     }
 
@@ -92,12 +80,12 @@ impl AlertMethods for Alert {
     fn prompt_value(&self) -> ~str {
         unsafe {
             // [nstextfield stringValue]
-            let selector = sel_registerName(transmute(&"stringValue"[0]));
             match self.nstextfield {
                 None => fail!("No prompt!"),
                 Some(nstextfield) => {
-                    let string = base::msg_send_id(transmute(nstextfield), selector);
-                    CFString::wrap_shared(transmute(string)).to_str()
+                    let string = nstextfield.send("stringValue", ());
+                    let string: CFString = TCFType::wrap_under_get_rule(transmute(string));
+                    string.to_str()
                 }
             }
         }
